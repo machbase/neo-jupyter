@@ -86,6 +86,7 @@ func (jl *JupyterLash) start0() {
 		"--ip=127.0.0.1",
 		"--port=8888",
 		"--ServerApp.base_url=/web/apps/neo-jupyter/base/",
+		"--LabApp.token=''", // disable token
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

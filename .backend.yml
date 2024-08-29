@@ -11,7 +11,7 @@ auto_start: false
 #   - TABLE_NAME=example
 
 stdout_log: debug
-stderr_log: warn
+stderr_log: info
 
 http_proxy:
   prefix: /base/
