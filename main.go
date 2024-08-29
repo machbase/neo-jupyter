@@ -111,7 +111,7 @@ func (jl *JupyterLash) start0() {
 			jl.logError("fail to run: %v", err)
 		} else {
 			if jl.cmd != nil && jl.cmd.Process != nil {
-				jl.log("exit code %d", jl.cmd.ProcessState.ExitCode())
+				jl.log("jupyter lab exit %d", jl.cmd.ProcessState.ExitCode())
 			}
 		}
 		jl.cmd = nil
