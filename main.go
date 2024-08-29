@@ -85,6 +85,7 @@ func (jl *JupyterLash) start0() {
 		"--notebook-dir", jl.notebookDir,
 		"--ip=127.0.0.1",
 		"--port=8888",
+		"--ServerApp.base_url=/web/apps/neo-jupyter/base/",
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
