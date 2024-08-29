@@ -51,6 +51,7 @@ func main() {
 	fmt.Println("started, press ctrl+c to stop...")
 	<-done
 
+	fmt.Println("stopping...")
 	jl.Stop()
 }
 
@@ -74,15 +75,17 @@ func (jl *JupyterLash) Start() {
 func (jl *JupyterLash) Stop() {
 	jl.Lock()
 	defer jl.Unlock()
-	if jl.cmd == nil {
-		return
-	}
 	jl.stop0()
 }
 
 func (jl *JupyterLash) start0() {
-	// --ip=<ip> --port=<int>
-	cmd := exec.Command(jl.pythonBin, jl.jupyterBin, "lab", "-y", "--no-browser", "--notebook-dir", jl.notebookDir)
+	cmd := exec.Command(jl.pythonBin, jl.jupyterBin, "lab",
+		"-y",
+		"--no-browser",
+		"--notebook-dir", jl.notebookDir,
+		"--ip=127.0.0.1",
+		"--port=8888",
+	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
@@ -102,12 +105,13 @@ func (jl *JupyterLash) start0() {
 		} else {
 			startWg.Done()
 		}
+		jl.cmd = cmd
 		err = cmd.Wait()
 		if err != nil {
 			jl.logError("fail to run: %v", err)
 		} else {
 			if jl.cmd != nil && jl.cmd.Process != nil {
-				jl.log("exit code", jl.cmd.ProcessState.ExitCode())
+				jl.log("exit code %d", jl.cmd.ProcessState.ExitCode())
 			}
 		}
 		jl.cmd = nil
@@ -119,20 +123,7 @@ func (jl *JupyterLash) stop0() {
 	if jl.cmd == nil || jl.cmd.Process == nil {
 		return
 	}
-	cmd := exec.Command(jl.jupyterBin, "server", "stop")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-	err := cmd.Start()
-	if err != nil {
-		jl.logError("fail to stop: cmd:%q error:%v", jl.jupyterBin, err)
-		return
-	}
-	err = cmd.Wait()
-	if err != nil {
-		jl.logError("fail to run: %v", err)
-	}
-
+	jl.cmd.Process.Signal(syscall.SIGINT)
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {

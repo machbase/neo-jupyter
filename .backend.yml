@@ -1,0 +1,19 @@
+start:
+  - run: |
+      ./.backend/start.sh
+stop:
+  - run: |
+      ./.backend/stop.sh
+
+auto_start: false
+
+# env:
+#   - TABLE_NAME=example
+
+stdout_log: debug
+stderr_log: warn
+
+http_proxy:
+  prefix: /lab/
+  target: http://localhost:8888
+  strip_prefix: /web/apps/neo-jupyter/

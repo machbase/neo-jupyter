@@ -22,3 +22,4 @@ packages/
 vendor/
 
 neo-jupyter*
+.backend/neo-jupyter*
