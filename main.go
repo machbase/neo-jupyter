@@ -102,9 +102,9 @@ func (jl *JupyterLash) start0() {
 			startWg.Done()
 			return
 		} else {
+			jl.cmd = cmd
 			startWg.Done()
 		}
-		jl.cmd = cmd
 		err = cmd.Wait()
 		if err != nil {
 			jl.logError("fail to run: %v", err)
@@ -122,14 +122,14 @@ func (jl *JupyterLash) stop0() {
 	if jl.cmd == nil || jl.cmd.Process == nil {
 		return
 	}
-	jl.cmd.Process.Signal(syscall.SIGINT)
+	jl.cmd.Process.Signal(syscall.SIGTERM)
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		count := 0
 		dur := 100 * time.Millisecond
-		tick := time.NewTimer(dur)
+		tick := time.NewTicker(dur)
 		for range tick.C {
 			if jl.cmd == nil {
 				break
