@@ -92,10 +92,6 @@ func (jl *JupyterLash) start0() {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
-	cmd.Env = []string{}
-	if home, err := os.UserHomeDir(); err == nil {
-		cmd.Env = append(cmd.Env, fmt.Sprintf("HOME=%s", home))
-	}
 	startWg := sync.WaitGroup{}
 	startWg.Add(1)
 	go func() {
@@ -153,28 +149,21 @@ func findPython() string {
 		"/usr/bin/python3",
 		"/usr/bin/python",
 	}
-
-	for _, path := range list {
-		if _, err := os.Stat(path); err == nil {
-			return path
-		}
-	}
-	return ""
+	return findPath(list)
 }
 
 func findJupyterExecutable() string {
 	list := []string{
-		"$HOME/.local/bin/jupyter",
+		"${HOME}/.local/bin/jupyter",
+		"/home/${USER}/.local/bin/jupyter",
 		"/usr/local/bin/jupyter",
 	}
+	return findPath(list)
+}
 
+func findPath(list []string) string {
 	for _, path := range list {
-		if strings.Contains(path, "$HOME") {
-			if home, err := os.UserHomeDir(); err == nil {
-				path = strings.ReplaceAll(path, "$HOME", home)
-			}
-			fmt.Println("===>", path)
-		}
+		path = os.ExpandEnv(path)
 		if _, err := os.Stat(path); err == nil {
 			return path
 		}
