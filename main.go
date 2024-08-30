@@ -86,6 +86,7 @@ func (jl *JupyterLash) start0() {
 		"--ip=127.0.0.1",
 		"--port=8888",
 		"--ServerApp.base_url=/web/apps/neo-jupyter/base/",
+		"--ServerApp.allow_remote_access=True",
 		"--LabApp.token=''", // disable token
 	)
 	cmd.Stdout = os.Stdout
@@ -172,6 +173,7 @@ func findJupyterExecutable() string {
 			if home, err := os.UserHomeDir(); err == nil {
 				path = strings.ReplaceAll(path, "$HOME", home)
 			}
+			fmt.Println("===>", path)
 		}
 		if _, err := os.Stat(path); err == nil {
 			return path
